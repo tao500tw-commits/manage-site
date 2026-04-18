@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>就醫回診管理 — 切膚之愛</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root {
+      --primary: #ea580c;
+      --primary-light: #fff7ed;
+      --secondary: #f97316;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Loading ── */
+    #loadingScreen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #c2410c, #f97316);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: white; z-index: 999;
+    }
+    .logo-text { font-size: 48px; margin-bottom: 12px; }
+    .loading-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .loading-sub { font-size: 13px; opacity: 0.8; margin-bottom: 28px; }
+    .spinner-lg {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Lock Screen ── */
+    #lockScreen {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      align-items: center; justify-content: center;
+      flex-direction: column; z-index: 500; color: white;
+      text-align: center; padding: 32px;
+    }
+    #lockScreen.show { display: flex; }
+    #lockScreen .lock-icon { font-size: 56px; margin-bottom: 16px; }
+    #lockScreen h2 { font-size: 20px; margin-bottom: 8px; }
+    #lockScreen p { font-size: 14px; opacity: 0.75; margin-bottom: 28px; line-height: 1.6; }
+    .btn-unlock {
+      padding: 13px 32px; background: var(--primary);
+      border: none; border-radius: 10px; color: white;
+      font-size: 16px; font-weight: 700; font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* ── Error ── */
+    #errorScreen {
+      display: none; position: fixed; inset: 0;
+      background: var(--gray-50);
+      align-items: center; justify-content: center;
+      flex-direction: column; padding: 32px; text-align: center; z-index: 998;
+    }
+    #errorScreen.show { display: flex; }
+    #errorScreen .icon { font-size: 48px; margin-bottom: 16px; }
+    #errorScreen h2 { font-size: 18px; margin-bottom: 8px; color: var(--danger); }
+    #errorScreen p { font-size: 14px; color: var(--gray-500); line-height: 1.7; }
+
+    /* ── Main App ── */
+    #app { display: none; }
+    #app.show { display: block; }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #c2410c, #f97316);
+      color: white; padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100;
+    }
+    .header-left h1 { font-size: 17px; font-weight: 700; }
+    .header-left .user-line {
+      font-size: 12px; opacity: 0.85; margin-top: 2px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .role-badge {
+      background: rgba(255,255,255,0.25);
+      padding: 1px 7px; border-radius: 8px; font-size: 11px;
+    }
+    /* Countdown */
+    .countdown-wrap { text-align: right; }
+    .countdown-label { font-size: 10px; opacity: 0.7; }
+    .countdown-value {
+      font-size: 18px; font-weight: 700;
+      font-variant-numeric: tabular-nums; letter-spacing: 1px;
+    }
+    .countdown-value.warning { color: #fde68a; }
+    .countdown-value.danger  { color: #fca5a5; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    /* ── Calendar ── */
+    .cal-container { padding: 14px 14px 0; }
+    .cal-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .cal-nav .month-title { font-size: 17px; font-weight: 700; }
+    .cal-nav-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1.5px solid var(--gray-200); background: white;
+      font-size: 15px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .cal-nav-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .cal-dow {
+      text-align: center; font-size: 11px; font-weight: 700;
+      color: var(--gray-500); padding: 4px 0;
+    }
+    .cal-dow:first-child { color: #ef4444; }
+    .cal-dow:last-child  { color: #3b82f6; }
+
+    .cal-day {
+      aspect-ratio: 1; border-radius: 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      cursor: pointer; position: relative;
+      transition: background 0.15s;
+      padding: 2px;
+    }
+    .cal-day:hover { background: var(--primary-light); }
+    .cal-day.other-month { opacity: 0.25; pointer-events: none; }
+    .cal-day.today { background: var(--primary-light); }
+    .cal-day.today .day-num { color: var(--primary); font-weight: 700; }
+    .cal-day.selected { background: var(--primary) !important; }
+    .cal-day.selected .day-num { color: white; }
+    .cal-day.sunday  .day-num { color: #ef4444; }
+    .cal-day.saturday .day-num { color: #3b82f6; }
+    .cal-day.selected .day-num { color: white !important; }
+
+    .day-num { font-size: 14px; font-weight: 600; line-height: 1; }
+
+    /* Dots for appointments */
+    .day-dots {
+      display: flex; gap: 2px; margin-top: 3px;
+      flex-wrap: wrap; justify-content: center; max-width: 32px;
+    }
+    .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+    }
+    .dot-pending  { background: #f59e0b; }
+    .dot-assigned { background: var(--success); }
+    .dot-cancelled{ background: var(--gray-300); }
+
+    /* ── Day Detail Panel ── */
+    .day-panel {
+      background: white; border-radius: 14px 14px 0 0;
+      margin: 10px -14px 0; padding: 18px 16px;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+      min-height: 200px;
+    }
+    .day-panel-title {
+      font-size: 15px; font-weight: 700; color: var(--primary);
+      margin-bottom: 14px; display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .day-panel-title .date-label { font-size: 13px; color: var(--gray-500); font-weight: 400; }
+
+    /* ── Revisit Item ── */
+    .revisit-item {
+      border: 1.5px solid var(--gray-200); border-radius: 10px;
+      padding: 13px; margin-bottom: 10px; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .revisit-item:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(234,88,12,0.1); }
+    .revisit-item:last-child { margin-bottom: 0; }
+    .item-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 6px;
+    }
+    .item-name { font-size: 16px; font-weight: 700; }
+    .status-tag {
+      font-size: 11px; padding: 2px 9px; border-radius: 8px; font-weight: 600;
+    }
+    .st-pending  { background: #fef3c7; color: #92400e; }
+    .st-assigned { background: #dcfce7; color: #166534; }
+    .st-cancelled{ background: var(--gray-100); color: var(--gray-500); }
+    .item-meta { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+    .item-meta .lbl { color: var(--gray-500); }
+
+    .empty-day {
+      text-align: center; padding: 32px 20px;
+      color: var(--gray-500); font-size: 14px;
+    }
+    .empty-day .icon { font-size: 32px; margin-bottom: 8px; }
+
+    /* ── Detail Modal (bottom sheet) ── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 200;
+    }
+    .overlay.show { display: block; }
+    .bottom-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-radius: 18px 18px 0 0;
+      padding: 22px 18px 36px; max-height: 88vh;
+      overflow-y: auto; z-index: 201;
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(.32,.72,0,1);
+    }
+    .bottom-sheet.show { transform: translateY(0); }
+    .sheet-handle {
+      width: 40px; height: 4px; background: var(--gray-200);
+      border-radius: 2px; margin: 0 auto 18px;
+    }
+    .sheet-title {
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .detail-row {
+      display: flex; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+      font-size: 14px;
+    }
+    .detail-row:last-of-type { border-bottom: none; }
+    .detail-lbl { color: var(--gray-500); width: 72px; flex-shrink: 0; }
+    .detail-val { color: var(--gray-900); font-weight: 500; }
+
+    .action-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-top: 18px;
+    }
+    .action-btn {
+      padding: 12px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .action-btn:hover { opacity: 0.85; }
+    .ab-primary  { background: var(--primary); color: white; }
+    .ab-outline  { background: var(--primary-light); color: var(--primary); }
+    .ab-danger   { background: #fef2f2; color: var(--danger); }
+    .ab-gray     { background: var(--gray-100); color: var(--gray-700); }
+
+    /* ── Sub-form in sheet ── */
+    .sub-form { margin-top: 16px; }
+    .sub-form label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--gray-700); margin-bottom: 5px;
+    }
+    .sub-form input, .sub-form select {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--gray-300); border-radius: 8px;
+      font-size: 14px; font-family: inherit; margin-bottom: 12px;
+    }
+    .sub-form input:focus, .sub-form select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(234,88,12,0.12);
+    }
+    .sub-form-title {
+      font-size: 14px; font-weight: 700; color: var(--primary);
+      margin-bottom: 12px; padding-top: 12px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--gray-900); color: white;
+      padding: 10px 20px; border-radius: 20px;
+      font-size: 13px; z-index: 999;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── Spinner inline ── */
+    .spinner-sm {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid var(--gray-200); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 5px;
+    }
+    .loading-row {
+      text-align: center; padding: 24px;
+      color: var(--gray-500); font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loadingScreen">
+  <div class="logo-text">✝</div>
+  <div class="loading-title">切膚之愛</div>
+  <div class="loading-sub">就醫回診管理系統</div>
+  <div class="spinner-lg"></div>
+</div>
+
+<!-- Lock Screen -->
+<div id="lockScreen">
+  <div class="lock-icon">🔒</div>
+  <h2>工作階段已到期</h2>
+  <p>為保護個案資料安全<br>每次查看限 10 分鐘<br>請重新驗證身分繼續使用</p>
+  <button class="btn-unlock" onclick="reauth()">重新驗證</button>
+</div>
+
+<!-- Error -->
+<div id="errorScreen">
+  <div class="icon">🔒</div>
+  <h2 id="errorTitle">無法驗證身分</h2>
+  <p id="errorMsg">請透過 LINE 開啟此頁面，或確認帳號已綁定且具有就醫功能權限。</p>
+</div>
+
+<!-- App -->
+<div id="app">
+
+  <header>
+    <div class="header-left">
+      <h1>🏥 就醫回診管理</h1>
+      <div class="user-line">
+        <span id="headerName">—</span>
+        <span class="role-badge" id="headerRole"></span>
+      </div>
+    </div>
+    <div class="countdown-wrap">
+      <div class="countdown-label">剩餘時間</div>
+      <div class="countdown-value" id="countdown">10:00</div>
+    </div>
+  </header>
+
+  <div class="cal-container">
+
+    <!-- Month nav -->
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
+      <div class="month-title" id="monthTitle"></div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
+    </div>
+
+    <!-- Day-of-week headers -->
+    <div class="cal-grid" id="calDow">
+      <div class="cal-dow">日</div><div class="cal-dow">一</div>
+      <div class="cal-dow">二</div><div class="cal-dow">三</div>
+      <div class="cal-dow">四</div><div class="cal-dow">五</div>
+      <div class="cal-dow">六</div>
+    </div>
+
+    <!-- Calendar days -->
+    <div class="cal-grid" id="calGrid"></div>
+
+    <!-- Day detail panel -->
+    <div class="day-panel">
+      <div class="day-panel-title">
+        <span>回診行程</span>
+        <span class="date-label" id="selectedDateLabel">請點選日期</span>
+      </div>
+      <div id="dayList">
+        <div class="empty-day">
+          <div class="icon">📅</div>點選日期查看當天回診
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- Detail Bottom Sheet -->
+<div class="bottom-sheet" id="detailSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheetName"></div>
+
+  <!-- Detail rows -->
+  <div id="sheetDetails"></div>
+
+  <!-- Action buttons -->
+  <div id="sheetActions" class="action-grid"></div>
+
+  <!-- Sub-form area (assign / edit) -->
+  <div id="subForm" style="display:none"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════ */
+const LIFF_ID  = '2009691225-LZDqAK6r';
+const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyFPJpgbA9UiShmtmga5LD0ve-aZkfrHoh_LGcR5pR6YY_xCJlwryb2mk3F_tnnS93FbA/exec';
+const SESSION_MINUTES = 10;
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let currentUser  = null;
+let calYear      = 0;
+let calMonth     = 0;   // 0-based
+let allRevisits  = [];  // all loaded for this month
+let selectedDate = null;
+let selectedItem = null;
+let countdownTimer = null;
+let secondsLeft  = SESSION_MINUTES * 60;
+
+/* ═══════════════════════════════════════
+   INIT & AUTH
+═══════════════════════════════════════ */
+async function init() {
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (!liff.isLoggedIn()) { liff.login(); return; }
+    await authenticate();
+  } catch (err) {
+    showError('初始化失敗', '請確認透過 LINE 開啟此頁面。\n' + err.message);
+  }
+}
+
+async function authenticate() {
+  const profile = await liff.getProfile();
+  const res = await gasPost({ action: 'verifyUser', userId: profile.userId });
+
+  if (!res.ok) {
+    showError('無權限存取', res.error || '帳號未綁定或無就醫功能權限，請聯絡主責督導。');
+    return;
+  }
+
+  currentUser = res.user;
+  document.getElementById('headerName').textContent = currentUser.name;
+  document.getElementById('headerRole').textContent = roleLabel(currentUser.role);
+
+  hide('loadingScreen');
+  document.getElementById('app').classList.add('show');
+
+  const now = new Date();
+  calYear  = now.getFullYear();
+  calMonth = now.getMonth();
+  await loadMonth();
+  startCountdown();
+}
+
+async function reauth() {
+  hide('lockScreen');
+  show('loadingScreen');
+  clearInterval(countdownTimer);
+  secondsLeft = SESSION_MINUTES * 60;
+  updateCountdownDisplay();
+  await authenticate();
+}
+
+/* ═══════════════════════════════════════
+   COUNTDOWN (10-min session)
+═══════════════════════════════════════ */
+function startCountdown() {
+  secondsLeft = SESSION_MINUTES * 60;
+  updateCountdownDisplay();
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    secondsLeft--;
+    updateCountdownDisplay();
+    if (secondsLeft <= 0) {
+      clearInterval(countdownTimer);
+      lockScreen();
+    }
+  }, 1000);
+}
+
+function updateCountdownDisplay() {
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  const el = document.getElementById('countdown');
+  el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  el.className = 'countdown-value' +
+    (secondsLeft <= 60 ? ' danger' : secondsLeft <= 180 ? ' warning' : '');
+}
+
+function lockScreen() {
+  closeSheet();
+  show('lockScreen');
+}
+
+/* ═══════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════ */
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  selectedDate = null;
+  document.getElementById('selectedDateLabel').textContent = '請點選日期';
+  document.getElementById('dayList').innerHTML =
+    '<div class="empty-day"><div class="icon">📅</div>點選日期查看當天回診</div>';
+  loadMonth();
+}
+
+async function loadMonth() {
+  renderCalendarShell();
+  const res = await gasPost({
+    action: 'getRevisitList',
+    userId: await getUserId(),
+    filter: 'month',
+    year: calYear, month: calMonth + 1
+  });
+  allRevisits = (res.ok && res.data) ? res.data : [];
+  renderCalendarDots();
+  if (selectedDate) renderDayList(selectedDate);
+}
+
+function renderCalendarShell() {
+  const rocYear = calYear - 1911;
+  document.getElementById('monthTitle').textContent =
+    rocYear + '年 ' + (calMonth + 1) + '月';
+
+  const grid     = document.getElementById('calGrid');
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInM  = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInP  = new Date(calYear, calMonth, 0).getDate();
+  const today    = new Date();
+
+  let cells = '';
+  // Prev month padding
+  for (let i = 0; i < firstDay; i++) {
+    const d = daysInP - firstDay + 1 + i;
+    cells += `<div class="cal-day other-month"><span class="day-num">${d}</span></div>`;
+  }
+  // Current month
+  for (let d = 1; d <= daysInM; d++) {
+    const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
+    const dow = new Date(calYear, calMonth, d).getDay();
+    const cls = [isToday?'today':'', dow===0?'sunday':dow===6?'saturday':''].filter(Boolean).join(' ');
+    const key = dateKey(calYear, calMonth+1, d);
+    cells += `<div class="cal-day ${cls}" id="day-${key}" data-key="${key}" onclick="selectDay('${key}',${d})">
+      <span class="day-num">${d}</span>
+      <div class="day-dots" id="dots-${key}"></div>
+    </div>`;
+  }
+  // Next month padding
+  const total = firstDay + daysInM;
+  const remain = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= remain; i++) {
+    cells += `<div class="cal-day other-month"><span class="day-num">${i}</span></div>`;
+  }
+  grid.innerHTML = cells;
+}
+
+function renderCalendarDots() {
+  // group by date
+  const byDate = {};
+  allRevisits.forEach(r => {
+    if (!byDate[r.date]) byDate[r.date] = [];
+    byDate[r.date].push(r);
+  });
+  Object.entries(byDate).forEach(([date, items]) => {
+    const el = document.getElementById('dots-' + date);
+    if (!el) return;
+    const dots = items.slice(0, 3).map(r => {
+      const cls = (r.status||'').includes('已取消') ? 'dot-cancelled'
+                : (r.status||'').includes('已安排') ? 'dot-assigned' : 'dot-pending';
+      return `<div class="dot ${cls}"></div>`;
+    }).join('');
+    el.innerHTML = dots;
+  });
+}
+
+function selectDay(key, d) {
+  // Deselect previous
+  if (selectedDate) {
+    const prev = document.getElementById('day-' + selectedDate);
+    if (prev) prev.classList.remove('selected');
+  }
+  selectedDate = key;
+  const el = document.getElementById('day-' + key);
+  if (el) el.classList.add('selected');
+
+  document.getElementById('selectedDateLabel').textContent =
+    (calMonth + 1) + '月' + d + '日';
+  renderDayList(key);
+}
+
+function renderDayList(key) {
+  const items = allRevisits.filter(r => r.date === key);
+  const el    = document.getElementById('dayList');
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-day"><div class="icon">📭</div>當天無回診行程</div>';
+    return;
+  }
+  el.innerHTML = items.map(item => {
+    const [cls, lbl] = statusInfo(item.status);
+    return `<div class="revisit-item" onclick="openDetail(${safeJson(item)})">
+      <div class="item-header">
+        <span class="item-name">${escHtml(item.name)}</span>
+        <span class="status-tag ${cls}">${lbl}</span>
+      </div>
+      <div class="item-meta">
+        <span class="lbl">🚌 乘車</span> ${escHtml(item.time)}&nbsp;&nbsp;
+        <span class="lbl">🏥</span> ${escHtml(item.destination)}<br>
+        ${item.companion ? `<span class="lbl">👤 陪同</span> ${escHtml(item.companion)}` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   DETAIL SHEET
+═══════════════════════════════════════ */
+function openDetail(item) {
+  selectedItem = item;
+  const [,lbl] = statusInfo(item.status);
+
+  document.getElementById('sheetName').textContent = item.name;
+  document.getElementById('subForm').style.display = 'none';
+  document.getElementById('subForm').innerHTML = '';
+
+  // Details
+  document.getElementById('sheetDetails').innerHTML = `
+    <div class="detail-row"><span class="detail-lbl">狀態</span><span class="detail-val">${escHtml(lbl)}</span></div>
+    <div class="detail-row"><span class="detail-lbl">📅 回診日期</span><span class="detail-val">${escHtml(item.date)}</span></div>
+    <div class="detail-row"><span class="detail-lbl">🚌 乘車時間</span><span class="detail-val">${escHtml(item.time)}</span></div>
+    <div class="detail-row"><span class="detail-lbl">🏥 目的地</span><span class="detail-val">${escHtml(item.destination)}</span></div>
+    <div class="detail-row"><span class="detail-lbl">♿ 輪椅</span><span class="detail-val">${escHtml(item.wheelchair)}</span></div>
+    <div class="detail-row"><span class="detail-lbl">📞 電話</span><span class="detail-val">${escHtml(maskPhone(item.phone))}</span></div>
+    ${item.companion ? `<div class="detail-row"><span class="detail-lbl">👤 陪同者</span><span class="detail-val">${escHtml(item.companion)}</span></div>` : ''}
+    ${item.remark    ? `<div class="detail-row"><span class="detail-lbl">📝 備註</span><span class="detail-val">${escHtml(item.remark)}</span></div>` : ''}
+  `;
+
+  // Action buttons depending on status
+  const notCancelled = !(item.status||'').includes('已取消');
+  let btns = '';
+  if (notCancelled && (item.status||'').includes('未指派')) {
+    btns += `<button class="action-btn ab-primary" onclick="showAssignForm()">🤝 指派陪同</button>`;
+  }
+  if (notCancelled) {
+    btns += `<button class="action-btn ab-outline" onclick="showEditForm()">✏️ 修改資料</button>`;
+    btns += `<button class="action-btn ab-danger"  onclick="confirmCancel()">❌ 取消回診</button>`;
+  }
+  btns += `<button class="action-btn ab-gray" onclick="closeSheet()">關閉</button>`;
+  document.getElementById('sheetActions').innerHTML = btns;
+
+  show('overlay'); show('detailSheet');
+}
+
+function showAssignForm() {
+  const f = document.getElementById('subForm');
+  f.style.display = 'block';
+  f.innerHTML = `
+    <div class="sub-form-title">🤝 指派陪同者</div>
+    <div class="sub-form">
+      <label>陪同者姓名</label>
+      <input type="text" id="companionInput" placeholder="請輸入陪同者姓名" maxlength="20">
+      <div style="display:flex;gap:10px;">
+        <button class="action-btn ab-primary" style="flex:1;padding:11px" onclick="submitAssign()">確定指派</button>
+        <button class="action-btn ab-gray" style="padding:11px 18px" onclick="hideSubForm()">取消</button>
+      </div>
+    </div>`;
+  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showEditForm() {
+  const f = document.getElementById('subForm');
+  f.style.display = 'block';
+  f.innerHTML = `
+    <div class="sub-form-title">✏️ 修改資料</div>
+    <div class="sub-form">
+      <label>修改欄位</label>
+      <select id="editField">
+        <option value="陪同者姓名">陪同者姓名</option>
+        <option value="回診日期">回診日期</option>
+        <option value="乘車時間">乘車時間</option>
+      </select>
+      <label>新的值</label>
+      <input type="text" id="editValue" placeholder="例：王小明 / 5/20 / 08:30">
+      <div style="display:flex;gap:10px;">
+        <button class="action-btn ab-primary" style="flex:1;padding:11px" onclick="submitEdit()">確定修改</button>
+        <button class="action-btn ab-gray" style="padding:11px 18px" onclick="hideSubForm()">取消</button>
+      </div>
+    </div>`;
+  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function confirmCancel() {
+  const f = document.getElementById('subForm');
+  f.style.display = 'block';
+  f.innerHTML = `
+    <div class="sub-form-title" style="color:var(--danger)">❌ 確認取消回診</div>
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:14px;">
+      取消後將標記為「已取消」，此操作無法復原。
+    </p>
+    <div style="display:flex;gap:10px;">
+      <button class="action-btn ab-danger" style="flex:1;padding:11px" onclick="submitCancel()">確定取消</button>
+      <button class="action-btn ab-gray" style="padding:11px 18px" onclick="hideSubForm()">返回</button>
+    </div>`;
+  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideSubForm() {
+  document.getElementById('subForm').style.display = 'none';
+}
+
+function closeSheet() {
+  hide('overlay'); hide('detailSheet');
+}
+
+/* ═══════════════════════════════════════
+   ACTIONS → GAS
+═══════════════════════════════════════ */
+async function submitAssign() {
+  const companion = document.getElementById('companionInput')?.value.trim();
+  if (!companion) { showToast('請輸入陪同者姓名'); return; }
+  const res = await gasPost({
+    action: 'assignCompanion',
+    userId: await getUserId(),
+    itemKey: selectedItem.key,
+    companion
+  });
+  closeSheet();
+  showToast(res.ok ? '✅ 指派成功！' : '❌ ' + (res.error||'失敗'));
+  if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
+}
+
+async function submitEdit() {
+  const field = document.getElementById('editField')?.value;
+  const value = document.getElementById('editValue')?.value.trim();
+  if (!value) { showToast('請輸入新的值'); return; }
+  const res = await gasPost({
+    action: 'editRevisit',
+    userId: await getUserId(),
+    itemKey: selectedItem.key,
+    field, value
+  });
+  closeSheet();
+  showToast(res.ok ? '✅ 修改成功！' : '❌ ' + (res.error||'失敗'));
+  if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
+}
+
+async function submitCancel() {
+  const res = await gasPost({
+    action: 'cancelRevisit',
+    userId: await getUserId(),
+    itemKey: selectedItem.key
+  });
+  closeSheet();
+  showToast(res.ok ? '✅ 已取消回診' : '❌ ' + (res.error||'失敗'));
+  if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
+}
+
+/* ═══════════════════════════════════════
+   GAS API
+═══════════════════════════════════════ */
+async function gasPost(payload) {
+  if (!GAS_URL) return { ok: false, error: '未設定 GAS 網址' };
+  try {
+    const resp = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify(payload)
+    });
+    return await resp.json();
+  } catch (err) {
+    return { ok: false, error: '網路錯誤：' + err.message };
+  }
+}
+
+async function getUserId() {
+  const profile = await liff.getProfile();
+  return profile.userId;
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function dateKey(y, m, d) {
+  return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+
+function statusInfo(status) {
+  if ((status||'').includes('已取消')) return ['st-cancelled', '❌ 已取消'];
+  if ((status||'').includes('已安排')) return ['st-assigned',  '✅ 已安排'];
+  return ['st-pending', '⏳ 未指派'];
+}
+
+function maskPhone(s) {
+  s = String(s||'').trim();
+  if (s.length < 6) return s;
+  return s.slice(0,4) + '***' + s.slice(-3);
+}
+
+function escHtml(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function safeJson(obj) {
+  return JSON.stringify(obj).replace(/"/g,'&quot;');
+}
+
+function roleLabel(r) {
+  return {SUPERVISOR:'督導',ADMIN:'管理員',CASE_MANAGER:'個管',MANAGER:'主管'}[r] || r;
+}
+
+function show(id) { document.getElementById(id).classList.add('show'); }
+function hide(id) { document.getElementById(id).classList.remove('show'); }
+
+function showError(title, msg) {
+  hide('loadingScreen');
+  document.getElementById('errorTitle').textContent = title;
+  document.getElementById('errorMsg').textContent   = msg;
+  show('errorScreen');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════════════════════════
+   START
+═══════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
