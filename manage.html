@@ -817,9 +817,14 @@ function roleLabel(r) {
   return {SUPERVISOR:'督導',ADMIN:'管理員',CASE_MANAGER:'個管',MANAGER:'主管'}[r] || r;
 }
 
-function show(id) { document.getElementById(id).classList.add('show'); }
-function hide(id) { document.getElementById(id).classList.remove('show'); }
-
+function show(id) { 
+  document.getElementById(id).classList.add('show'); 
+  if (id === 'loadingScreen') document.getElementById(id).style.display = 'flex';
+}
+function hide(id) { 
+  document.getElementById(id).classList.remove('show'); 
+  if (id === 'loadingScreen') document.getElementById(id).style.display = 'none';
+}
 function showError(title, msg) {
   hide('loadingScreen');
   document.getElementById('errorTitle').textContent = title;
