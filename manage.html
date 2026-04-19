@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>就醫回診管理 — 切膚之愛</title>
-  <script src="https://liff.line.me/2009829634-TciEZ1U7"></script>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root {
       --primary: #ea580c;
@@ -817,14 +817,9 @@ function roleLabel(r) {
   return {SUPERVISOR:'督導',ADMIN:'管理員',CASE_MANAGER:'個管',MANAGER:'主管'}[r] || r;
 }
 
-function show(id) { 
-  document.getElementById(id).classList.add('show'); 
-  if (id === 'loadingScreen') document.getElementById(id).style.display = 'flex';
-}
-function hide(id) { 
-  document.getElementById(id).classList.remove('show'); 
-  if (id === 'loadingScreen') document.getElementById(id).style.display = 'none';
-}
+function show(id) { document.getElementById(id).classList.add('show'); }
+function hide(id) { document.getElementById(id).classList.remove('show'); }
+
 function showError(title, msg) {
   hide('loadingScreen');
   document.getElementById('errorTitle').textContent = title;
