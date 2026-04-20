@@ -591,8 +591,8 @@ async function submitNewRevisit() {
     showToast('⚠️ 請填寫所有必填欄位（*）'); return;
   }
   const phoneDigits = phone.replace(/\D/g,'');
-  if (phoneDigits.length < 9 || phoneDigits.length > 11) {
-    showToast('⚠️ 電話格式不正確'); return;
+  if (phoneDigits.length < 6) {
+    showToast('⚠️ 電話號碼太短（至少 6 碼）'); return;
   }
 
   const res = await gasPost({
