@@ -597,6 +597,7 @@ async function submitNewRevisit() {
 
   const res = await gasPost({
     action: 'saveRevisit',
+    userId: await getUserId(),
     '個案姓名': name, '回診日期': date, '乘車時間': time,
     '目的地': dest, '是否有輪椅': wheelchair,
     '陪同者電話': phone, '主責督導': sv, '備註': remark
