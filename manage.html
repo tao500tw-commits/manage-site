@@ -9,7 +9,6 @@
     :root {
       --primary: #ea580c;
       --primary-light: #fff7ed;
-      --secondary: #f97316;
       --danger: #dc2626;
       --success: #16a34a;
       --gray-50: #f9fafb;
@@ -23,24 +22,19 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
-      background: var(--gray-50);
-      color: var(--gray-900);
-      min-height: 100vh;
-      overflow-x: hidden;
+      background: var(--gray-50); color: var(--gray-900);
+      min-height: 100vh; overflow-x: hidden;
     }
 
     /* ── Loading ── */
-    /* [BUG FIX] 原本寫死 display:flex，導致 hide() 移除 show class 無效，loading 畫面永遠蓋住 */
     #loadingScreen {
       position: fixed; inset: 0;
       background: linear-gradient(135deg, #c2410c, #f97316);
-      display: none; /* 預設隱藏，靠 .show 顯示 */
-      flex-direction: column;
+      display: none; flex-direction: column;
       align-items: center; justify-content: center;
       color: white; z-index: 999;
     }
     #loadingScreen.show { display: flex; }
-
     .logo-text { font-size: 48px; margin-bottom: 12px; }
     .loading-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
     .loading-sub { font-size: 13px; opacity: 0.8; margin-bottom: 28px; }
@@ -67,14 +61,12 @@
     .btn-unlock {
       padding: 13px 32px; background: var(--primary);
       border: none; border-radius: 10px; color: white;
-      font-size: 16px; font-weight: 700; font-family: inherit;
-      cursor: pointer;
+      font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer;
     }
 
     /* ── Error ── */
     #errorScreen {
-      display: none; position: fixed; inset: 0;
-      background: var(--gray-50);
+      display: none; position: fixed; inset: 0; background: var(--gray-50);
       align-items: center; justify-content: center;
       flex-direction: column; padding: 32px; text-align: center; z-index: 998;
     }
@@ -127,10 +119,7 @@
       align-items: center; justify-content: center;
     }
     .cal-nav-btn:hover { background: var(--primary-light); border-color: var(--primary); }
-    .cal-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-dow {
       text-align: center; font-size: 11px; font-weight: 700;
       color: var(--gray-500); padding: 4px 0;
@@ -141,9 +130,7 @@
       aspect-ratio: 1; border-radius: 10px;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      cursor: pointer; position: relative;
-      transition: background 0.15s;
-      padding: 2px;
+      cursor: pointer; transition: background 0.15s; padding: 2px;
     }
     .cal-day:hover { background: var(--primary-light); }
     .cal-day.other-month { opacity: 0.25; pointer-events: none; }
@@ -154,10 +141,7 @@
     .cal-day.sunday  .day-num { color: #ef4444; }
     .cal-day.saturday .day-num { color: #3b82f6; }
     .day-num { font-size: 14px; font-weight: 600; line-height: 1; }
-    .day-dots {
-      display: flex; gap: 2px; margin-top: 3px;
-      flex-wrap: wrap; justify-content: center; max-width: 32px;
-    }
+    .day-dots { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; max-width: 32px; }
     .dot { width: 5px; height: 5px; border-radius: 50%; }
     .dot-pending  { background: #f59e0b; }
     .dot-assigned { background: var(--success); }
@@ -167,8 +151,8 @@
     .day-panel {
       background: white; border-radius: 14px 14px 0 0;
       margin: 10px -14px 0; padding: 18px 16px;
-      box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
-      min-height: 200px;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.08); min-height: 200px;
+      padding-bottom: 80px; /* FAB 空間 */
     }
     .day-panel-title {
       font-size: 15px; font-weight: 700; color: var(--primary);
@@ -185,117 +169,91 @@
     }
     .revisit-item:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(234,88,12,0.1); }
     .revisit-item:last-child { margin-bottom: 0; }
-    .item-header {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 6px;
-    }
+    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .item-name { font-size: 16px; font-weight: 700; }
-    .status-tag {
-      font-size: 11px; padding: 2px 9px; border-radius: 8px; font-weight: 600;
-    }
+    .status-tag { font-size: 11px; padding: 2px 9px; border-radius: 8px; font-weight: 600; }
     .st-pending  { background: #fef3c7; color: #92400e; }
     .st-assigned { background: #dcfce7; color: #166534; }
     .st-cancelled{ background: var(--gray-100); color: var(--gray-500); }
     .item-meta { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
     .item-meta .lbl { color: var(--gray-500); }
-    .empty-day {
-      text-align: center; padding: 32px 20px;
-      color: var(--gray-500); font-size: 14px;
-    }
+    .empty-day { text-align: center; padding: 32px 20px; color: var(--gray-500); font-size: 14px; }
     .empty-day .icon { font-size: 32px; margin-bottom: 8px; }
 
-    /* ── Detail Modal (bottom sheet) ── */
-    .overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45); z-index: 200;
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: 24px; right: 20px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--primary); color: white;
+      border: none; font-size: 30px; font-weight: 300;
+      cursor: pointer; z-index: 150;
+      box-shadow: 0 4px 16px rgba(234,88,12,0.45);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(234,88,12,0.55); }
+
+    /* ── Detail Modal (bottom sheet) ── */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; }
     .overlay.show { display: block; }
     .bottom-sheet {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: white; border-radius: 18px 18px 0 0;
-      padding: 22px 18px 36px; max-height: 88vh;
+      padding: 22px 18px 36px; max-height: 90vh;
       overflow-y: auto; z-index: 201;
       transform: translateY(100%);
       transition: transform 0.28s cubic-bezier(.32,.72,0,1);
     }
     .bottom-sheet.show { transform: translateY(0); }
-    .sheet-handle {
-      width: 40px; height: 4px; background: var(--gray-200);
-      border-radius: 2px; margin: 0 auto 18px;
-    }
+    .sheet-handle { width: 40px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 18px; }
     .sheet-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
-    .detail-row {
-      display: flex; gap: 10px;
-      padding: 10px 0; border-bottom: 1px solid var(--gray-100);
-      font-size: 14px;
-    }
+    .detail-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; }
     .detail-row:last-of-type { border-bottom: none; }
-    .detail-lbl { color: var(--gray-500); width: 72px; flex-shrink: 0; }
+    .detail-lbl { color: var(--gray-500); width: 80px; flex-shrink: 0; }
     .detail-val { color: var(--gray-900); font-weight: 500; }
-    .action-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px; margin-top: 18px;
-    }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
     .action-btn {
       padding: 12px; border: none; border-radius: 10px;
       font-size: 14px; font-weight: 700; font-family: inherit;
       cursor: pointer; transition: opacity 0.15s;
     }
     .action-btn:hover { opacity: 0.85; }
-    .ab-primary  { background: var(--primary); color: white; }
+    .ab-primary { background: var(--primary); color: white; }
     .ab-outline  { background: var(--primary-light); color: var(--primary); }
     .ab-danger   { background: #fef2f2; color: var(--danger); }
     .ab-gray     { background: var(--gray-100); color: var(--gray-700); }
+    .ab-full     { grid-column: 1 / -1; }
 
-    /* ── Sub-form in sheet ── */
-    .sub-form { margin-top: 16px; }
-    .sub-form label {
-      display: block; font-size: 13px; font-weight: 600;
-      color: var(--gray-700); margin-bottom: 5px;
-    }
-    .sub-form input, .sub-form select {
-      width: 100%; padding: 10px 12px;
-      border: 1.5px solid var(--gray-300); border-radius: 8px;
-      font-size: 14px; font-family: inherit; margin-bottom: 12px;
-    }
-    .sub-form input:focus, .sub-form select:focus {
-      outline: none; border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(234,88,12,0.12);
-    }
-    .sub-form-title {
+    /* ── Form elements ── */
+    .form-section { margin-top: 16px; }
+    .form-section-title {
       font-size: 14px; font-weight: 700; color: var(--primary);
       margin-bottom: 12px; padding-top: 12px;
       border-top: 1px solid var(--gray-100);
     }
-
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 30px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--gray-900); color: white;
-      padding: 10px 20px; border-radius: 20px;
-      font-size: 13px; z-index: 999;
-      opacity: 0; transition: opacity 0.3s;
-      pointer-events: none; white-space: nowrap;
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--gray-700); margin-bottom: 5px;
     }
-    .toast.show { opacity: 1; }
-
-    /* ── Spinner inline ── */
-    .spinner-sm {
-      display: inline-block; width: 14px; height: 14px;
-      border: 2px solid var(--gray-200); border-top-color: var(--primary);
-      border-radius: 50%; animation: spin 0.7s linear infinite;
-      vertical-align: middle; margin-right: 5px;
+    .form-group label .req { color: var(--danger); }
+    .form-group input,
+    .form-group select {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--gray-300); border-radius: 8px;
+      font-size: 14px; font-family: inherit;
     }
-    .loading-row {
-      text-align: center; padding: 24px;
-      color: var(--gray-500); font-size: 13px;
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(234,88,12,0.12);
     }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
   </style>
 </head>
 <body>
 
-<!-- Loading：初始帶 show class，hide() 才能正確移除 -->
 <div id="loadingScreen" class="show">
   <div class="logo-text">✝</div>
   <div class="loading-title">切膚之愛</div>
@@ -303,7 +261,6 @@
   <div class="spinner-lg"></div>
 </div>
 
-<!-- Lock Screen -->
 <div id="lockScreen">
   <div class="lock-icon">🔒</div>
   <h2>工作階段已到期</h2>
@@ -311,16 +268,13 @@
   <button class="btn-unlock" onclick="reauth()">重新驗證</button>
 </div>
 
-<!-- Error -->
 <div id="errorScreen">
   <div class="icon">🔒</div>
   <h2 id="errorTitle">無法驗證身分</h2>
   <p id="errorMsg">請透過 LINE 開啟此頁面，或確認帳號已綁定且具有就醫功能權限。</p>
 </div>
 
-<!-- App -->
 <div id="app">
-
   <header>
     <div class="header-left">
       <h1>🏥 就醫回診管理</h1>
@@ -336,79 +290,59 @@
   </header>
 
   <div class="cal-container">
-
-    <!-- Month nav -->
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
       <div class="month-title" id="monthTitle"></div>
       <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
     </div>
-
-    <!-- Day-of-week headers -->
-    <div class="cal-grid" id="calDow">
+    <div class="cal-grid">
       <div class="cal-dow">日</div><div class="cal-dow">一</div>
       <div class="cal-dow">二</div><div class="cal-dow">三</div>
       <div class="cal-dow">四</div><div class="cal-dow">五</div>
       <div class="cal-dow">六</div>
     </div>
-
-    <!-- Calendar days -->
     <div class="cal-grid" id="calGrid"></div>
-
-    <!-- Day detail panel -->
     <div class="day-panel">
       <div class="day-panel-title">
         <span>回診行程</span>
         <span class="date-label" id="selectedDateLabel">請點選日期</span>
       </div>
       <div id="dayList">
-        <div class="empty-day">
-          <div class="icon">📅</div>點選日期查看當天回診
-        </div>
+        <div class="empty-day"><div class="icon">📅</div>點選日期查看當天回診</div>
       </div>
     </div>
-
   </div>
+
+  <!-- FAB 新增按鈕 -->
+  <button class="fab" onclick="openNewRevisit()" title="新增回診">＋</button>
 </div>
 
-<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="closeSheet()"></div>
 
-<!-- Detail Bottom Sheet -->
 <div class="bottom-sheet" id="detailSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-title" id="sheetName"></div>
   <div id="sheetDetails"></div>
   <div id="sheetActions" class="action-grid"></div>
-  <div id="subForm" style="display:none"></div>
+  <div id="subForm"></div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════
-   CONFIG
-═══════════════════════════════════════ */
-const LIFF_ID  = '2009829634-TciEZ1U7';
-const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyFPJpgbA9UiShmtmga5LD0ve-aZkfrHoh_LGcR5pR6YY_xCJlwryb2mk3F_tnnS93FbA/exec';
+const LIFF_ID = '2009829634-TciEZ1U7';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFPJpgbA9UiShmtmga5LD0ve-aZkfrHoh_LGcR5pR6YY_xCJlwryb2mk3F_tnnS93FbA/exec';
 const SESSION_MINUTES = 10;
 
-/* ═══════════════════════════════════════
-   STATE
-═══════════════════════════════════════ */
 let currentUser  = null;
-let calYear      = 0;
-let calMonth     = 0;
+let calYear = 0, calMonth = 0;
 let allRevisits  = [];
 let selectedDate = null;
 let selectedItem = null;
 let countdownTimer = null;
 let secondsLeft  = SESSION_MINUTES * 60;
 
-/* ═══════════════════════════════════════
-   INIT & AUTH
-═══════════════════════════════════════ */
+/* ══ INIT ══ */
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
@@ -422,38 +356,27 @@ async function init() {
 async function authenticate() {
   const profile = await liff.getProfile();
   const res = await gasPost({ action: 'verifyUser', userId: profile.userId });
-
-  if (!res.ok) {
-    showError('無權限存取', res.error || '帳號未綁定或無就醫功能權限，請聯絡主責督導。');
-    return;
-  }
-
+  if (!res.ok) { showError('無權限存取', res.error || '帳號未綁定或無就醫功能權限。'); return; }
   currentUser = res.user;
   document.getElementById('headerName').textContent = currentUser.name;
   document.getElementById('headerRole').textContent = roleLabel(currentUser.role);
-
   hide('loadingScreen');
   document.getElementById('app').classList.add('show');
-
   const now = new Date();
-  calYear  = now.getFullYear();
-  calMonth = now.getMonth();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
   await loadMonth();
   startCountdown();
 }
 
 async function reauth() {
-  hide('lockScreen');
-  show('loadingScreen');
+  hide('lockScreen'); show('loadingScreen');
   clearInterval(countdownTimer);
   secondsLeft = SESSION_MINUTES * 60;
   updateCountdownDisplay();
   await authenticate();
 }
 
-/* ═══════════════════════════════════════
-   COUNTDOWN (10-min session)
-═══════════════════════════════════════ */
+/* ══ COUNTDOWN ══ */
 function startCountdown() {
   secondsLeft = SESSION_MINUTES * 60;
   updateCountdownDisplay();
@@ -461,83 +384,59 @@ function startCountdown() {
   countdownTimer = setInterval(() => {
     secondsLeft--;
     updateCountdownDisplay();
-    if (secondsLeft <= 0) {
-      clearInterval(countdownTimer);
-      lockScreen();
-    }
+    if (secondsLeft <= 0) { clearInterval(countdownTimer); lockScreen(); }
   }, 1000);
 }
-
 function updateCountdownDisplay() {
-  const m = Math.floor(secondsLeft / 60);
-  const s = secondsLeft % 60;
+  const m = Math.floor(secondsLeft / 60), s = secondsLeft % 60;
   const el = document.getElementById('countdown');
   el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-  el.className = 'countdown-value' +
-    (secondsLeft <= 60 ? ' danger' : secondsLeft <= 180 ? ' warning' : '');
+  el.className = 'countdown-value' + (secondsLeft <= 60 ? ' danger' : secondsLeft <= 180 ? ' warning' : '');
 }
+function lockScreen() { closeSheet(); show('lockScreen'); }
 
-function lockScreen() {
-  closeSheet();
-  show('lockScreen');
-}
-
-/* ═══════════════════════════════════════
-   CALENDAR
-═══════════════════════════════════════ */
+/* ══ CALENDAR ══ */
 function changeMonth(dir) {
   calMonth += dir;
   if (calMonth < 0) { calMonth = 11; calYear--; }
   if (calMonth > 11) { calMonth = 0; calYear++; }
   selectedDate = null;
   document.getElementById('selectedDateLabel').textContent = '請點選日期';
-  document.getElementById('dayList').innerHTML =
-    '<div class="empty-day"><div class="icon">📅</div>點選日期查看當天回診</div>';
+  document.getElementById('dayList').innerHTML = '<div class="empty-day"><div class="icon">📅</div>點選日期查看當天回診</div>';
   loadMonth();
 }
 
 async function loadMonth() {
   renderCalendarShell();
-  const res = await gasPost({
-    action: 'getRevisitList',
-    userId: await getUserId(),
-    filter: 'month',
-    year: calYear, month: calMonth + 1
-  });
+  const res = await gasPost({ action: 'getRevisitList', userId: await getUserId(), filter: 'month', year: calYear, month: calMonth + 1 });
   allRevisits = (res.ok && res.data) ? res.data : [];
   renderCalendarDots();
   if (selectedDate) renderDayList(selectedDate);
 }
 
 function renderCalendarShell() {
-  const rocYear = calYear - 1911;
-  document.getElementById('monthTitle').textContent =
-    rocYear + '年 ' + (calMonth + 1) + '月';
-
-  const grid     = document.getElementById('calGrid');
+  document.getElementById('monthTitle').textContent = (calYear - 1911) + '年 ' + (calMonth + 1) + '月';
+  const grid = document.getElementById('calGrid');
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInM  = new Date(calYear, calMonth + 1, 0).getDate();
   const daysInP  = new Date(calYear, calMonth, 0).getDate();
   const today    = new Date();
-
   let cells = '';
   for (let i = 0; i < firstDay; i++) {
-    const d = daysInP - firstDay + 1 + i;
-    cells += `<div class="cal-day other-month"><span class="day-num">${d}</span></div>`;
+    cells += `<div class="cal-day other-month"><span class="day-num">${daysInP - firstDay + 1 + i}</span></div>`;
   }
   for (let d = 1; d <= daysInM; d++) {
     const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
     const dow = new Date(calYear, calMonth, d).getDay();
     const cls = [isToday?'today':'', dow===0?'sunday':dow===6?'saturday':''].filter(Boolean).join(' ');
     const key = dateKey(calYear, calMonth+1, d);
-    cells += `<div class="cal-day ${cls}" id="day-${key}" data-key="${key}" onclick="selectDay('${key}',${d})">
+    cells += `<div class="cal-day ${cls}" id="day-${key}" onclick="selectDay('${key}',${d})">
       <span class="day-num">${d}</span>
       <div class="day-dots" id="dots-${key}"></div>
     </div>`;
   }
-  const total = firstDay + daysInM;
-  const remain = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for (let i = 1; i <= remain; i++) {
+  const remain = (firstDay + daysInM) % 7;
+  for (let i = 1; i <= (remain ? 7 - remain : 0); i++) {
     cells += `<div class="cal-day other-month"><span class="day-num">${i}</span></div>`;
   }
   grid.innerHTML = cells;
@@ -545,42 +444,31 @@ function renderCalendarShell() {
 
 function renderCalendarDots() {
   const byDate = {};
-  allRevisits.forEach(r => {
-    if (!byDate[r.date]) byDate[r.date] = [];
-    byDate[r.date].push(r);
-  });
+  allRevisits.forEach(r => { (byDate[r.date] = byDate[r.date]||[]).push(r); });
   Object.entries(byDate).forEach(([date, items]) => {
     const el = document.getElementById('dots-' + date);
     if (!el) return;
-    const dots = items.slice(0, 3).map(r => {
+    el.innerHTML = items.slice(0,3).map(r => {
       const cls = (r.status||'').includes('已取消') ? 'dot-cancelled'
                 : (r.status||'').includes('已安排') ? 'dot-assigned' : 'dot-pending';
       return `<div class="dot ${cls}"></div>`;
     }).join('');
-    el.innerHTML = dots;
   });
 }
 
 function selectDay(key, d) {
-  if (selectedDate) {
-    const prev = document.getElementById('day-' + selectedDate);
-    if (prev) prev.classList.remove('selected');
-  }
+  if (selectedDate) { const p = document.getElementById('day-'+selectedDate); if (p) p.classList.remove('selected'); }
   selectedDate = key;
-  const el = document.getElementById('day-' + key);
+  const el = document.getElementById('day-'+key);
   if (el) el.classList.add('selected');
-  document.getElementById('selectedDateLabel').textContent =
-    (calMonth + 1) + '月' + d + '日';
+  document.getElementById('selectedDateLabel').textContent = (calMonth+1) + '月' + d + '日';
   renderDayList(key);
 }
 
 function renderDayList(key) {
   const items = allRevisits.filter(r => r.date === key);
-  const el    = document.getElementById('dayList');
-  if (!items.length) {
-    el.innerHTML = '<div class="empty-day"><div class="icon">📭</div>當天無回診行程</div>';
-    return;
-  }
+  const el = document.getElementById('dayList');
+  if (!items.length) { el.innerHTML = '<div class="empty-day"><div class="icon">📭</div>當天無回診行程</div>'; return; }
   el.innerHTML = items.map(item => {
     const [cls, lbl] = statusInfo(item.status);
     return `<div class="revisit-item" onclick="openDetail(${safeJson(item)})">
@@ -597,15 +485,11 @@ function renderDayList(key) {
   }).join('');
 }
 
-/* ═══════════════════════════════════════
-   DETAIL SHEET
-═══════════════════════════════════════ */
+/* ══ DETAIL SHEET（查看）══ */
 function openDetail(item) {
   selectedItem = item;
   const [,lbl] = statusInfo(item.status);
-
   document.getElementById('sheetName').textContent = item.name;
-  document.getElementById('subForm').style.display = 'none';
   document.getElementById('subForm').innerHTML = '';
 
   document.getElementById('sheetDetails').innerHTML = `
@@ -615,134 +499,245 @@ function openDetail(item) {
     <div class="detail-row"><span class="detail-lbl">🏥 目的地</span><span class="detail-val">${escHtml(item.destination)}</span></div>
     <div class="detail-row"><span class="detail-lbl">♿ 輪椅</span><span class="detail-val">${escHtml(item.wheelchair)}</span></div>
     <div class="detail-row"><span class="detail-lbl">📞 電話</span><span class="detail-val">${escHtml(maskPhone(item.phone))}</span></div>
-    ${item.companion ? `<div class="detail-row"><span class="detail-lbl">👤 陪同者</span><span class="detail-val">${escHtml(item.companion)}</span></div>` : ''}
-    ${item.remark    ? `<div class="detail-row"><span class="detail-lbl">📝 備註</span><span class="detail-val">${escHtml(item.remark)}</span></div>` : ''}
+    ${item.supervisor ? `<div class="detail-row"><span class="detail-lbl">👤 主責督導</span><span class="detail-val">${escHtml(item.supervisor)}</span></div>` : ''}
+    ${item.companion  ? `<div class="detail-row"><span class="detail-lbl">🤝 陪同者</span><span class="detail-val">${escHtml(item.companion)}</span></div>` : ''}
+    ${item.remark     ? `<div class="detail-row"><span class="detail-lbl">📝 備註</span><span class="detail-val">${escHtml(item.remark)}</span></div>` : ''}
   `;
 
   const notCancelled = !(item.status||'').includes('已取消');
   let btns = '';
-  if (notCancelled && (item.status||'').includes('未指派')) {
-    btns += `<button class="action-btn ab-primary" onclick="showAssignForm()">🤝 指派陪同</button>`;
-  }
   if (notCancelled) {
+    if ((item.status||'').includes('未指派'))
+      btns += `<button class="action-btn ab-primary" onclick="showAssignForm()">🤝 指派陪同</button>`;
     btns += `<button class="action-btn ab-outline" onclick="showEditForm()">✏️ 修改資料</button>`;
     btns += `<button class="action-btn ab-danger"  onclick="confirmCancel()">❌ 取消回診</button>`;
   }
   btns += `<button class="action-btn ab-gray" onclick="closeSheet()">關閉</button>`;
   document.getElementById('sheetActions').innerHTML = btns;
-
   show('overlay'); show('detailSheet');
 }
 
-function showAssignForm() {
-  const f = document.getElementById('subForm');
-  f.style.display = 'block';
-  f.innerHTML = `
-    <div class="sub-form-title">🤝 指派陪同者</div>
-    <div class="sub-form">
-      <label>陪同者姓名</label>
-      <input type="text" id="companionInput" placeholder="請輸入陪同者姓名" maxlength="20">
-      <div style="display:flex;gap:10px;">
-        <button class="action-btn ab-primary" style="flex:1;padding:11px" onclick="submitAssign()">確定指派</button>
-        <button class="action-btn ab-gray" style="padding:11px 18px" onclick="hideSubForm()">取消</button>
+/* ══ 新增回診 ══ */
+function openNewRevisit() {
+  selectedItem = null;
+  const today = new Date().toISOString().slice(0,10);
+  const defaultSv = currentUser?.revisitSupervisor || '';
+
+  document.getElementById('sheetName').textContent = '➕ 新增回診';
+  document.getElementById('sheetDetails').innerHTML = '';
+  document.getElementById('sheetActions').innerHTML = '';
+  document.getElementById('subForm').innerHTML = `
+    <div class="form-section">
+      <div class="form-row">
+        <div class="form-group">
+          <label>個案姓名 <span class="req">*</span></label>
+          <input type="text" id="nf-name" placeholder="請輸入姓名" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label>主責督導 <span class="req">*</span></label>
+          <input type="text" id="nf-sv" value="${escHtml(defaultSv)}" maxlength="20">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>回診日期 <span class="req">*</span></label>
+          <input type="date" id="nf-date" value="${today}">
+        </div>
+        <div class="form-group">
+          <label>乘車時間 <span class="req">*</span></label>
+          <input type="time" id="nf-time">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>目的地 <span class="req">*</span></label>
+        <input type="text" id="nf-dest" placeholder="例：彰化基督教醫院" maxlength="50">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>是否有輪椅 <span class="req">*</span></label>
+          <select id="nf-wheelchair">
+            <option value="否">否</option>
+            <option value="是">是</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>陪同者電話 <span class="req">*</span></label>
+          <input type="tel" id="nf-phone" placeholder="0912345678" maxlength="15">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>備註</label>
+        <input type="text" id="nf-remark" placeholder="（選填）" maxlength="100">
+      </div>
+      <div class="action-grid" style="margin-top:4px">
+        <button class="action-btn ab-primary ab-full" onclick="submitNewRevisit()">✅ 新增回診</button>
+        <button class="action-btn ab-gray ab-full" onclick="closeSheet()">取消</button>
       </div>
     </div>`;
-  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  show('overlay'); show('detailSheet');
 }
 
+async function submitNewRevisit() {
+  const name      = document.getElementById('nf-name').value.trim();
+  const date      = document.getElementById('nf-date').value;
+  const time      = document.getElementById('nf-time').value;
+  const dest      = document.getElementById('nf-dest').value.trim();
+  const wheelchair= document.getElementById('nf-wheelchair').value;
+  const phone     = document.getElementById('nf-phone').value.trim();
+  const sv        = document.getElementById('nf-sv').value.trim();
+  const remark    = document.getElementById('nf-remark').value.trim();
+
+  if (!name || !date || !time || !dest || !phone || !sv) {
+    showToast('⚠️ 請填寫所有必填欄位（*）'); return;
+  }
+  const phoneDigits = phone.replace(/\D/g,'');
+  if (phoneDigits.length < 9 || phoneDigits.length > 11) {
+    showToast('⚠️ 電話格式不正確'); return;
+  }
+
+  const res = await gasPost({
+    action: 'saveRevisit',
+    '個案姓名': name, '回診日期': date, '乘車時間': time,
+    '目的地': dest, '是否有輪椅': wheelchair,
+    '陪同者電話': phone, '主責督導': sv, '備註': remark
+  });
+  closeSheet();
+  showToast(res.ok ? '✅ 新增成功！' : '❌ ' + (res.error||'新增失敗'));
+  if (res.ok) await loadMonth();
+}
+
+/* ══ 完整修改表單 ══ */
 function showEditForm() {
-  const f = document.getElementById('subForm');
-  f.style.display = 'block';
-  f.innerHTML = `
-    <div class="sub-form-title">✏️ 修改資料</div>
-    <div class="sub-form">
-      <label>修改欄位</label>
-      <select id="editField">
-        <option value="陪同者姓名">陪同者姓名</option>
-        <option value="回診日期">回診日期</option>
-        <option value="乘車時間">乘車時間</option>
-      </select>
-      <label>新的值</label>
-      <input type="text" id="editValue" placeholder="例：王小明 / 5/20 / 08:30">
-      <div style="display:flex;gap:10px;">
-        <button class="action-btn ab-primary" style="flex:1;padding:11px" onclick="submitEdit()">確定修改</button>
-        <button class="action-btn ab-gray" style="padding:11px 18px" onclick="hideSubForm()">取消</button>
+  const item = selectedItem;
+  document.getElementById('sheetActions').innerHTML = '';
+  document.getElementById('subForm').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title">✏️ 修改回診資料</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>個案姓名</label>
+          <input type="text" id="ef-name" value="${escHtml(item.name)}" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label>主責督導</label>
+          <input type="text" id="ef-sv" value="${escHtml(item.supervisor||currentUser?.revisitSupervisor||'')}" maxlength="20">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>回診日期</label>
+          <input type="date" id="ef-date" value="${item.date}">
+        </div>
+        <div class="form-group">
+          <label>乘車時間</label>
+          <input type="time" id="ef-time" value="${item.time}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>目的地</label>
+        <input type="text" id="ef-dest" value="${escHtml(item.destination)}" maxlength="50">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>是否有輪椅</label>
+          <select id="ef-wheelchair">
+            <option value="否" ${item.wheelchair!=='是'?'selected':''}>否</option>
+            <option value="是" ${item.wheelchair==='是'?'selected':''}>是</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>陪同者電話</label>
+          <input type="tel" id="ef-phone" value="${escHtml(item.phone)}" maxlength="15">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>陪同者姓名</label>
+        <input type="text" id="ef-companion" value="${escHtml(item.companion||'')}" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>備註</label>
+        <input type="text" id="ef-remark" value="${escHtml(item.remark||'')}" maxlength="100">
+      </div>
+      <div class="action-grid" style="margin-top:4px">
+        <button class="action-btn ab-primary" onclick="submitFullEdit()">✅ 確定修改</button>
+        <button class="action-btn ab-gray"    onclick="openDetail(selectedItem)">取消</button>
       </div>
     </div>`;
-  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('subForm').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-function confirmCancel() {
-  const f = document.getElementById('subForm');
-  f.style.display = 'block';
-  f.innerHTML = `
-    <div class="sub-form-title" style="color:var(--danger)">❌ 確認取消回診</div>
-    <p style="font-size:13px;color:var(--gray-500);margin-bottom:14px;">
-      取消後將標記為「已取消」，此操作無法復原。
-    </p>
-    <div style="display:flex;gap:10px;">
-      <button class="action-btn ab-danger" style="flex:1;padding:11px" onclick="submitCancel()">確定取消</button>
-      <button class="action-btn ab-gray" style="padding:11px 18px" onclick="hideSubForm()">返回</button>
+async function submitFullEdit() {
+  const res = await gasPost({
+    action:      'editFullRevisit',
+    userId:      await getUserId(),
+    itemKey:     selectedItem.key,
+    name:        document.getElementById('ef-name').value.trim(),
+    date:        document.getElementById('ef-date').value,
+    time:        document.getElementById('ef-time').value,
+    destination: document.getElementById('ef-dest').value.trim(),
+    wheelchair:  document.getElementById('ef-wheelchair').value,
+    phone:       document.getElementById('ef-phone').value.trim(),
+    companion:   document.getElementById('ef-companion').value.trim(),
+    supervisor:  document.getElementById('ef-sv').value.trim(),
+    remark:      document.getElementById('ef-remark').value.trim()
+  });
+  closeSheet();
+  showToast(res.ok ? '✅ 修改成功！' : '❌ ' + (res.error||'修改失敗'));
+  if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
+}
+
+/* ══ 指派陪同 ══ */
+function showAssignForm() {
+  document.getElementById('sheetActions').innerHTML = '';
+  document.getElementById('subForm').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title">🤝 指派陪同者</div>
+      <div class="form-group">
+        <label>陪同者姓名</label>
+        <input type="text" id="companionInput" placeholder="請輸入陪同者姓名" maxlength="20">
+      </div>
+      <div class="action-grid">
+        <button class="action-btn ab-primary" onclick="submitAssign()">確定指派</button>
+        <button class="action-btn ab-gray"    onclick="openDetail(selectedItem)">取消</button>
+      </div>
     </div>`;
-  f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('subForm').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-function hideSubForm() {
-  document.getElementById('subForm').style.display = 'none';
-}
-
-function closeSheet() {
-  hide('overlay'); hide('detailSheet');
-}
-
-/* ═══════════════════════════════════════
-   ACTIONS → GAS
-═══════════════════════════════════════ */
 async function submitAssign() {
   const companion = document.getElementById('companionInput')?.value.trim();
   if (!companion) { showToast('請輸入陪同者姓名'); return; }
-  const res = await gasPost({
-    action: 'assignCompanion',
-    userId: await getUserId(),
-    itemKey: selectedItem.key,
-    companion
-  });
+  const res = await gasPost({ action:'assignCompanion', userId:await getUserId(), itemKey:selectedItem.key, companion });
   closeSheet();
   showToast(res.ok ? '✅ 指派成功！' : '❌ ' + (res.error||'失敗'));
   if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
 }
 
-async function submitEdit() {
-  const field = document.getElementById('editField')?.value;
-  const value = document.getElementById('editValue')?.value.trim();
-  if (!value) { showToast('請輸入新的值'); return; }
-  const res = await gasPost({
-    action: 'editRevisit',
-    userId: await getUserId(),
-    itemKey: selectedItem.key,
-    field, value
-  });
-  closeSheet();
-  showToast(res.ok ? '✅ 修改成功！' : '❌ ' + (res.error||'失敗'));
-  if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
+/* ══ 取消回診 ══ */
+function confirmCancel() {
+  document.getElementById('sheetActions').innerHTML = '';
+  document.getElementById('subForm').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title" style="color:var(--danger)">❌ 確認取消回診</div>
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:14px;">取消後將標記為「已取消」，此操作無法復原。</p>
+      <div class="action-grid">
+        <button class="action-btn ab-danger" onclick="submitCancel()">確定取消</button>
+        <button class="action-btn ab-gray"   onclick="openDetail(selectedItem)">返回</button>
+      </div>
+    </div>`;
 }
 
 async function submitCancel() {
-  const res = await gasPost({
-    action: 'cancelRevisit',
-    userId: await getUserId(),
-    itemKey: selectedItem.key
-  });
+  const res = await gasPost({ action:'cancelRevisit', userId:await getUserId(), itemKey:selectedItem.key });
   closeSheet();
   showToast(res.ok ? '✅ 已取消回診' : '❌ ' + (res.error||'失敗'));
   if (res.ok) { await loadMonth(); if (selectedDate) renderDayList(selectedDate); }
 }
 
-/* ═══════════════════════════════════════
-   GAS API
-═══════════════════════════════════════ */
+function closeSheet() { hide('overlay'); hide('detailSheet'); }
+
+/* ══ GAS API ══ */
 async function gasPost(payload) {
-  if (!GAS_URL) return { ok: false, error: '未設定 GAS 網址' };
   try {
     const resp = await fetch(GAS_URL, {
       method: 'POST',
@@ -754,65 +749,40 @@ async function gasPost(payload) {
     return { ok: false, error: '網路錯誤：' + err.message };
   }
 }
+async function getUserId() { return (await liff.getProfile()).userId; }
 
-async function getUserId() {
-  const profile = await liff.getProfile();
-  return profile.userId;
-}
-
-/* ═══════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════ */
-function dateKey(y, m, d) {
-  return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-}
-
+/* ══ HELPERS ══ */
+function dateKey(y, m, d) { return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
 function statusInfo(status) {
-  if ((status||'').includes('已取消')) return ['st-cancelled', '❌ 已取消'];
-  if ((status||'').includes('已安排')) return ['st-assigned',  '✅ 已安排'];
-  return ['st-pending', '⏳ 未指派'];
+  if ((status||'').includes('已取消')) return ['st-cancelled','❌ 已取消'];
+  if ((status||'').includes('已安排')) return ['st-assigned', '✅ 已安排'];
+  return ['st-pending','⏳ 未指派'];
 }
-
 function maskPhone(s) {
   s = String(s||'').trim();
   if (s.length < 6) return s;
   return s.slice(0,4) + '***' + s.slice(-3);
 }
-
 function escHtml(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
-function safeJson(obj) {
-  return JSON.stringify(obj).replace(/"/g,'&quot;');
-}
-
-function roleLabel(r) {
-  return {SUPERVISOR:'督導',ADMIN:'管理員',CASE_MANAGER:'個管',MANAGER:'主管'}[r] || r;
-}
-
+function safeJson(obj) { return JSON.stringify(obj).replace(/"/g,'&quot;'); }
+function roleLabel(r) { return {SUPERVISOR:'督導',ADMIN:'管理員',CASE_MANAGER:'個管',MANAGER:'主管'}[r]||r; }
 function show(id) { document.getElementById(id).classList.add('show'); }
 function hide(id) { document.getElementById(id).classList.remove('show'); }
-
 function showError(title, msg) {
   hide('loadingScreen');
   document.getElementById('errorTitle').textContent = title;
   document.getElementById('errorMsg').textContent   = msg;
   show('errorScreen');
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-/* ═══════════════════════════════════════
-   START
-═══════════════════════════════════════ */
 init();
 </script>
 </body>
