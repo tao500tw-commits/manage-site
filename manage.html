@@ -30,13 +30,17 @@
     }
 
     /* ── Loading ── */
+    /* [BUG FIX] 原本寫死 display:flex，導致 hide() 移除 show class 無效，loading 畫面永遠蓋住 */
     #loadingScreen {
       position: fixed; inset: 0;
       background: linear-gradient(135deg, #c2410c, #f97316);
-      display: flex; flex-direction: column;
+      display: none; /* 預設隱藏，靠 .show 顯示 */
+      flex-direction: column;
       align-items: center; justify-content: center;
       color: white; z-index: 999;
     }
+    #loadingScreen.show { display: flex; }
+
     .logo-text { font-size: 48px; margin-bottom: 12px; }
     .loading-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
     .loading-sub { font-size: 13px; opacity: 0.8; margin-bottom: 28px; }
@@ -99,7 +103,6 @@
       background: rgba(255,255,255,0.25);
       padding: 1px 7px; border-radius: 8px; font-size: 11px;
     }
-    /* Countdown */
     .countdown-wrap { text-align: right; }
     .countdown-label { font-size: 10px; opacity: 0.7; }
     .countdown-value {
@@ -124,7 +127,6 @@
       align-items: center; justify-content: center;
     }
     .cal-nav-btn:hover { background: var(--primary-light); border-color: var(--primary); }
-
     .cal-grid {
       display: grid; grid-template-columns: repeat(7, 1fr);
       gap: 4px;
@@ -135,7 +137,6 @@
     }
     .cal-dow:first-child { color: #ef4444; }
     .cal-dow:last-child  { color: #3b82f6; }
-
     .cal-day {
       aspect-ratio: 1; border-radius: 10px;
       display: flex; flex-direction: column;
@@ -149,21 +150,15 @@
     .cal-day.today { background: var(--primary-light); }
     .cal-day.today .day-num { color: var(--primary); font-weight: 700; }
     .cal-day.selected { background: var(--primary) !important; }
-    .cal-day.selected .day-num { color: white; }
+    .cal-day.selected .day-num { color: white !important; }
     .cal-day.sunday  .day-num { color: #ef4444; }
     .cal-day.saturday .day-num { color: #3b82f6; }
-    .cal-day.selected .day-num { color: white !important; }
-
     .day-num { font-size: 14px; font-weight: 600; line-height: 1; }
-
-    /* Dots for appointments */
     .day-dots {
       display: flex; gap: 2px; margin-top: 3px;
       flex-wrap: wrap; justify-content: center; max-width: 32px;
     }
-    .dot {
-      width: 5px; height: 5px; border-radius: 50%;
-    }
+    .dot { width: 5px; height: 5px; border-radius: 50%; }
     .dot-pending  { background: #f59e0b; }
     .dot-assigned { background: var(--success); }
     .dot-cancelled{ background: var(--gray-300); }
@@ -203,7 +198,6 @@
     .st-cancelled{ background: var(--gray-100); color: var(--gray-500); }
     .item-meta { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
     .item-meta .lbl { color: var(--gray-500); }
-
     .empty-day {
       text-align: center; padding: 32px 20px;
       color: var(--gray-500); font-size: 14px;
@@ -229,10 +223,7 @@
       width: 40px; height: 4px; background: var(--gray-200);
       border-radius: 2px; margin: 0 auto 18px;
     }
-    .sheet-title {
-      font-size: 18px; font-weight: 700;
-      margin-bottom: 16px;
-    }
+    .sheet-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
     .detail-row {
       display: flex; gap: 10px;
       padding: 10px 0; border-bottom: 1px solid var(--gray-100);
@@ -241,7 +232,6 @@
     .detail-row:last-of-type { border-bottom: none; }
     .detail-lbl { color: var(--gray-500); width: 72px; flex-shrink: 0; }
     .detail-val { color: var(--gray-900); font-weight: 500; }
-
     .action-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 10px; margin-top: 18px;
@@ -305,8 +295,8 @@
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loadingScreen">
+<!-- Loading：初始帶 show class，hide() 才能正確移除 -->
+<div id="loadingScreen" class="show">
   <div class="logo-text">✝</div>
   <div class="loading-title">切膚之愛</div>
   <div class="loading-sub">就醫回診管理系統</div>
@@ -388,14 +378,8 @@
 <div class="bottom-sheet" id="detailSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-title" id="sheetName"></div>
-
-  <!-- Detail rows -->
   <div id="sheetDetails"></div>
-
-  <!-- Action buttons -->
   <div id="sheetActions" class="action-grid"></div>
-
-  <!-- Sub-form area (assign / edit) -->
   <div id="subForm" style="display:none"></div>
 </div>
 
@@ -415,8 +399,8 @@ const SESSION_MINUTES = 10;
 ═══════════════════════════════════════ */
 let currentUser  = null;
 let calYear      = 0;
-let calMonth     = 0;   // 0-based
-let allRevisits  = [];  // all loaded for this month
+let calMonth     = 0;
+let allRevisits  = [];
 let selectedDate = null;
 let selectedItem = null;
 let countdownTimer = null;
@@ -537,12 +521,10 @@ function renderCalendarShell() {
   const today    = new Date();
 
   let cells = '';
-  // Prev month padding
   for (let i = 0; i < firstDay; i++) {
     const d = daysInP - firstDay + 1 + i;
     cells += `<div class="cal-day other-month"><span class="day-num">${d}</span></div>`;
   }
-  // Current month
   for (let d = 1; d <= daysInM; d++) {
     const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===d;
     const dow = new Date(calYear, calMonth, d).getDay();
@@ -553,7 +535,6 @@ function renderCalendarShell() {
       <div class="day-dots" id="dots-${key}"></div>
     </div>`;
   }
-  // Next month padding
   const total = firstDay + daysInM;
   const remain = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (let i = 1; i <= remain; i++) {
@@ -563,7 +544,6 @@ function renderCalendarShell() {
 }
 
 function renderCalendarDots() {
-  // group by date
   const byDate = {};
   allRevisits.forEach(r => {
     if (!byDate[r.date]) byDate[r.date] = [];
@@ -582,7 +562,6 @@ function renderCalendarDots() {
 }
 
 function selectDay(key, d) {
-  // Deselect previous
   if (selectedDate) {
     const prev = document.getElementById('day-' + selectedDate);
     if (prev) prev.classList.remove('selected');
@@ -590,7 +569,6 @@ function selectDay(key, d) {
   selectedDate = key;
   const el = document.getElementById('day-' + key);
   if (el) el.classList.add('selected');
-
   document.getElementById('selectedDateLabel').textContent =
     (calMonth + 1) + '月' + d + '日';
   renderDayList(key);
@@ -630,7 +608,6 @@ function openDetail(item) {
   document.getElementById('subForm').style.display = 'none';
   document.getElementById('subForm').innerHTML = '';
 
-  // Details
   document.getElementById('sheetDetails').innerHTML = `
     <div class="detail-row"><span class="detail-lbl">狀態</span><span class="detail-val">${escHtml(lbl)}</span></div>
     <div class="detail-row"><span class="detail-lbl">📅 回診日期</span><span class="detail-val">${escHtml(item.date)}</span></div>
@@ -642,7 +619,6 @@ function openDetail(item) {
     ${item.remark    ? `<div class="detail-row"><span class="detail-lbl">📝 備註</span><span class="detail-val">${escHtml(item.remark)}</span></div>` : ''}
   `;
 
-  // Action buttons depending on status
   const notCancelled = !(item.status||'').includes('已取消');
   let btns = '';
   if (notCancelled && (item.status||'').includes('未指派')) {
