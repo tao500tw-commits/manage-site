@@ -255,6 +255,27 @@
 </head>
 <body>
 
+<!-- 系統整併通知（2026-08-09）：回診管理已併入行政系統 /revisit/，本頁停用。
+     本頁停用的另一個原因是資安：/claude-security 全庫掃描在此頁抓到儲存型 XSS
+     （F2：sheet 來源的紀錄經 safeJson 注入 inline onclick，而 safeJson 只換掉裸的雙引號，
+     `&quot;` 會被 HTML parser 解回真正的引號後當成 JS 執行），以及多筆無擁有者檢查的
+     寫入路徑（F4/F12/F21~F24）。LINE 就醫選單的「開啟管理系統」已改指向 /revisit/，
+     此 LIFF 部署一併封存。**重新啟用前務必先修完上述問題。** -->
+<!-- ⚠️ 必須是**蓋在最上層的全螢幕**：本頁的 #loadingScreen 是 position:fixed / inset:0 / z-index:999
+     且開場就帶 .show，一般區塊會被它整個蓋住看不見。而且後端 7 個 web action 已封路，
+     頁面就算載入完也只會顯示讀取失敗——使用者永遠看不到這則公告。故 z-index 設 1000 蓋過去。 -->
+<div style="position:fixed; inset:0; z-index:1000; background:#FFF4E5; color:#5A3A18;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            padding:24px; text-align:center; line-height:1.8; font-family:system-ui,-apple-system,sans-serif;">
+  <div style="font-size:44px; margin-bottom:10px;">📢</div>
+  <div style="font-weight:700; font-size:17px; margin-bottom:8px;">本頁已整併至<br>「切膚之愛長照行政系統」</div>
+  <div style="font-size:14px; max-width:340px;">回診管理請改用新入口<br>（資料同一張表、內容一致）</div>
+  <a href="https://sgwlf-ltc.web.app/revisit/"
+     style="display:inline-block; margin-top:18px; background:#D85A1E; color:#fff; text-decoration:none;
+            font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px;">前往新版回診管理 →</a>
+  <div style="font-size:12px; opacity:.7; margin-top:22px;">若你是從 LINE 的「就醫」選單進來，<br>請改點該選單的「🌐 開啟管理系統」</div>
+</div>
+
 <div id="loadingScreen" class="show">
   <div class="logo-text">✝</div>
   <div class="loading-title">切膚之愛</div>
@@ -442,7 +463,10 @@ function renderCalendarShell() {
     const cell = document.createElement('div');
     cell.className = ['cal-day', isToday?'today':'', dow===0?'sunday':dow===6?'saturday':''].filter(Boolean).join(' ');
     cell.id = 'day-' + key;
+    cell.setAttribute('role', 'button');
+    cell.tabIndex = 0;   // 鍵盤入口（T12）：Enter/Space 同點擊
     cell.addEventListener('click', function() { selectDay(key, d); }); // key/d 為區塊作用域，逐格閉包各自獨立
+    cell.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selectDay(key, d); } });
     const num = document.createElement('span');
     num.className = 'day-num';
     num.textContent = String(d);
@@ -505,7 +529,10 @@ function renderDayList(key) {
     const [cls, lbl] = statusInfo(item.status);
     const card = document.createElement('div');
     card.className = 'revisit-item';
+    card.setAttribute('role', 'button');
+    card.tabIndex = 0;   // 鍵盤入口（T12）：Enter/Space 同點擊
     card.addEventListener('click', function() { openDetail(item); });
+    card.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openDetail(item); } });
 
     const header = document.createElement('div');
     header.className = 'item-header';
